@@ -14,6 +14,7 @@ export default function WorkCarousel() {
               width={1200}
               height={675}
               sizes="(max-width: 767px) 88vw, 1200px"
+              className="w-full h-auto"
               priority={slide === 1}
             />
           </div>
