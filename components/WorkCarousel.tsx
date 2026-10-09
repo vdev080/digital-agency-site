@@ -1,24 +1,12 @@
-import Image from "next/image";
+type WorkItem = { imageUrl: string; title: string; url: string };
 
-const slides = [1, 2, 3, 4, 5, 6];
-
-export default function WorkCarousel() {
+export default function WorkCarousel({ work }: { work: WorkItem[] }) {
+  const source = work.length ? work : [{ imageUrl: "/images/work-slider-img-1.webp", title: "Featured project", url: "" }];
+  const slides = Array.from({ length: Math.max(6, source.length * 2) }, (_, index) => source[index % source.length]);
   return (
     <div className="work-slider" aria-label="Selected work">
       <div className="work-track">
-        {slides.map((slide) => (
-          <div className="slide-item" key={slide}>
-            <Image
-              src="/images/work-slider-img-1.webp"
-              alt="Featured project"
-              width={1200}
-              height={675}
-              sizes="(max-width: 767px) 88vw, 1200px"
-              className="w-full h-auto"
-              priority={slide === 1}
-            />
-          </div>
-        ))}
+        {slides.map((slide, index) => <div className="slide-item" key={`${slide.imageUrl}-${index}`}><img src={slide.imageUrl} alt={slide.title || "Featured project"} /></div>)}
       </div>
     </div>
   );

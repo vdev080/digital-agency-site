@@ -2,15 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import MenuButton from "@/components/MenuButton";
 import WorkCarousel from "@/components/WorkCarousel";
+import { getHomepage } from "@/lib/homepage";
 
-const services = [
-  ["/images/feature-services-icon-1.png", "Custom Software Development"],
-  ["/images/feature-services-icon-2.png", "Product Design"],
-  ["/images/feature-services-icon-3.png", "Quality Assurance"],
-  ["/images/feature-services-icon-4.png", "Consulting Services"],
-] as const;
-
-export default function Home() {
+export default async function Home() {
+  const homepage = await getHomepage();
+  const headingLines = homepage.banner.heading.split("\n");
+  const firstLine = headingLines[0] || "Bigger,";
+  const secondLineWords = (headingLines.slice(1).join(" ") || "Bolder and Better").split(" ");
+  const emphasizedWord = secondLineWords.pop();
   return (
     <main>
       <header className="site-header">
@@ -24,17 +23,16 @@ export default function Home() {
         <div className="container">
           <div className="hero-top">
             <h1 id="hero-heading" className="hero-title">
-              Bigger,<br />Bolder and <span>Better</span>
+              {firstLine}<br />{secondLineWords.join(" ")} {emphasizedWord && <span>{emphasizedWord}</span>}
             </h1>
             <div className="hero-copy">
-              <p>We help business elevate their value through custom software development, product design, QA and consulting services.</p>
+              <p>{homepage.banner.description}</p>
               <a href="#about" className="button button-outline">Learn More</a>
             </div>
           </div>
           <div className="hero-stats">
             <ul>
-              <li><strong>95%</strong><span>Client Satisfaction</span></li>
-              <li><strong>125+</strong><span>Projects Completed</span></li>
+              {homepage.banner.statistics.sort((a, b) => a.sortOrder - b.sortOrder).map((statistic) => <li key={`${statistic.value}-${statistic.label}`}><strong>{statistic.value}</strong><span>{statistic.label}</span></li>)}
             </ul>
           </div>
         </div>
@@ -43,23 +41,23 @@ export default function Home() {
       <section id="about" className="info-section section-padding">
         <div className="container">
           <ul className="qualities">
-            <li>Top-notch Experience</li><li>Expert Team</li><li>Timely Delivery</li>
+            {homepage.bannerInfo.topList.sort((a, b) => a.sortOrder - b.sortOrder).map((item) => <li key={item.text}>{item.text}</li>)}
           </ul>
           <div className="intro-row">
             <div className="founder">
-              <Image src="/images/founder.png" alt="Founder" width={100} height={100} />
-              <span>Founder &amp; CEO</span>
+              <Image src={homepage.bannerInfo.founder.imageUrl || "/images/founder.png"} alt={homepage.bannerInfo.founder.name || "Founder"} width={100} height={100} unoptimized />
+              <span>{homepage.bannerInfo.founder.title}</span>
             </div>
             <div className="intro-copy">
-              <h2>We are a team of passionate designers and developers who create amazing digital experiences.</h2>
+              <h2>{homepage.bannerInfo.heading}</h2>
               <a href="#work" className="button button-blue">Learn More</a>
             </div>
           </div>
           <ul className="service-list">
-            {services.map(([icon, title]) => (
-              <li key={title}>
-                <Image src={icon} alt="" width={60} height={60} />
-                <h3>{title}</h3>
+            {homepage.bannerInfo.services.sort((a, b) => a.sortOrder - b.sortOrder).map((service) => (
+              <li key={service.title}>
+                <Image src={service.iconUrl} alt="" width={60} height={60} unoptimized />
+                <h3>{service.title}</h3>
               </li>
             ))}
           </ul>
@@ -70,7 +68,7 @@ export default function Home() {
         <div className="container">
           <div className="work-heading"><h2>Our Work</h2><a href="#work" className="button button-blue">View All</a></div>
         </div>
-        <WorkCarousel />
+        <WorkCarousel work={homepage.work.sort((a, b) => a.sortOrder - b.sortOrder)} />
       </section>
     </main>
   );
