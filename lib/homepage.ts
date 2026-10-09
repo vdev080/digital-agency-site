@@ -12,9 +12,10 @@ export const homepageFallback: Homepage = {
 
 export async function getHomepage(): Promise<Homepage> {
   try {
-    const response = await fetch(`${process.env.BACKEND_URL ?? "http://localhost:5000"}/api/homepage`, { cache: "no-store" });
+    const response = await fetch(`${apiUrl}/api/homepage`, { cache: "no-store" });
     if (!response.ok) return homepageFallback;
     const payload = await response.json();
     return payload?.data?.homepage ?? homepageFallback;
   } catch { return homepageFallback; }
 }
+import { apiUrl } from "@/lib/api";
